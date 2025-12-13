@@ -15,9 +15,9 @@ const updatedItems=[...state.items];
 if(existingCartItemIndex>-1){
 const updatedItem={
     ...state.items[existingCartItemIndex],
-    quantity:state.items[existingCartItemIndex].quantity+1
+    quantity:state.items[existingCartItemIndex].quantity+1,
 }
-updatedItems[existingCartItemIndex]=[updatedItem];
+updatedItems[existingCartItemIndex]=updatedItem;
 }
 else{
 updatedItems.push({...action.item,quantity:1})
@@ -34,7 +34,7 @@ const  existingCartItem=state.items[existingCartItemIndex];
 const updatedItems=[...state.items];
 if(existingCartItem.quantity===1){
  
-    updatedItems.splice(existingCartItem,1);
+    updatedItems.splice(existingCartItemIndex,1);
 }
 else{
     const updatedItem={
@@ -72,7 +72,7 @@ const cartContext={
     removeItem
 }
 
-
+console.log(cartContext);
     return <CartContext value={cartContext}>{children}</CartContext>
 }
 
