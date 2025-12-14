@@ -34,7 +34,7 @@ const userProgressCtx={
 showCart,
 hideCart,
 showCheckout,
-hideCheckout
+hideCheckout,
 }
 
 // Corrected return statement in UserProgressContextProvider
