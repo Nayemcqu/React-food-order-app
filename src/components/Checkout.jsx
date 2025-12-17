@@ -8,6 +8,7 @@ import userProgressContext from "../store/UserProgressContext";
 import { use } from "react";
 import UseHttp from "../hooks/useHttp";
 import Error from "./Error";
+import { useActionState } from "react";
 const requestConfig={
     method:'POST',
     headers:{
@@ -20,7 +21,7 @@ const cartCtx=useContext(CartContext);
 const cartTotal=cartCtx.items.reduce((totalPrice,item)=>totalPrice+item.quantity*item.price,0);
 const userProgressCtx=useContext(userProgressContext);
 
-const {data,isLoading:isSending,error,sendRequest,clearData}=UseHttp('http://localhost:3000/orders',requestConfig);
+const {data,error,sendRequest,clearData}=UseHttp('http://localhost:3000/orders',requestConfig);
 
 function handleClose(){
     userProgressCtx.hideCheckout();
@@ -32,21 +33,18 @@ function handleFinish(){
 clearData();
 }
 
-function handleSubmit(e){
-    e.preventDefault();
-const fd=new FormData(e.target);
+async function checkoutActions(prev,fd){
 const CustomerData=Object.fromEntries(fd.entries());
 
-sendRequest(JSON.stringify({
+ await sendRequest(JSON.stringify({
     order:{
         items:cartCtx.items,
         customer:CustomerData
     }
 }));
-
-
-
 }
+const [formState,formAction,pending] = useActionState(checkoutActions,null);
+
 
 let actions=(
 <>
@@ -56,11 +54,9 @@ let actions=(
 
 );
 
-
-if(isSending){
-    actions=<span>Sending order data...</span>
+if(pending){
+actions=<span>sending order data...</span>
 }
-
 if(data && !error){
 return <Modal open={userProgressCtx.progress==='checkout'} onClose={handleFinish}>
 
@@ -76,7 +72,7 @@ return <Modal open={userProgressCtx.progress==='checkout'} onClose={handleFinish
 }
 
 return <Modal open={userProgressCtx.progress==="checkout"} onClose={handleClose}>
-<form onSubmit={handleSubmit}>
+<form action={formAction}>
 <h2>Checkout</h2>
 <p>Total Amount:{currencyFormatter.format(cartTotal)}</p>
 <Input label="Full Name" type="text" id="name"/>
